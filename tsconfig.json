@@ -1,10 +1,40 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    // Module and target options
     "module": "commonjs",
+    "target": "ES2021",
+
+    // Interop and compatibility
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    // Strictness options
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+
+    // Emit options
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
+    // Debugging options
+    "sourceMap": true,
+
+    // Directory and path mapping
     "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true
-  }
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    // Other options
+    "incremental": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules", "./dist/**/*"]
 }
