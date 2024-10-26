@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import authRouter from '@/routes/auth';
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 app.get('/', (req, res): void => {
   res.send('Server is running!');
 });
+app.use('/api', authRouter);
 
 const PORT = process.env.PORT ?? '3000';
 
