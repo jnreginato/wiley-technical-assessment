@@ -1,0 +1,12 @@
+name: wiley-technical-assessment
+services:
+  app:
+    build: .
+    container_name: wiley-technical-assessment-nodejs
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/var/www/src
+      - ./.env:/var/www/.env
+      - ./jest.config.js:/var/www/jest.config.js
+      - ./tsconfig.json:/var/www/tsconfig.json
