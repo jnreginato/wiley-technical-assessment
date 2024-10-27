@@ -1,5 +1,5 @@
 export default interface CourseResponse {
-  id: number;
+  id: bigint | number | string;
   title: string;
   description: string;
   duration: number;

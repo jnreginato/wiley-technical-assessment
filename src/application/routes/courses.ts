@@ -7,11 +7,12 @@ import type CourseResponse from '@/application/responses/CourseResponse';
 import type ErrorResponse from '@/application/responses/ErrorResponse';
 // eslint-disable-next-line import/no-duplicates
 import type { Response } from 'express';
+import CourseController from '@/application/controllers/CourseController';
 import AuthMiddleware from '@/application/middlewares/AuthMiddleware';
-import { courses } from '@/application/responses/CourseResponse';
 
 const coursesRouter = Router();
 const authMiddleware = new AuthMiddleware();
+const courseController = new CourseController();
 
 // Create a course
 coursesRouter.post(
@@ -20,11 +21,8 @@ coursesRouter.post(
   (
     req: Request<never, CourseResponse, CourseRequestBody, never>,
     res: Response<CourseResponse>,
-  ) => {
-    const course: CourseRequestBody = req.body;
-    const courseEntity = { ...course, id: courses.length + 1 };
-    courses.push(courseEntity);
-    res.status(201).json(courseEntity);
+  ): void => {
+    courseController.createCourse(req.body, res);
   },
 );
 
@@ -33,10 +31,10 @@ coursesRouter.get(
   '/courses',
   authMiddleware.process,
   (
-    _req: Request<never, CourseResponse[], never, CourseRequestQueryParams>,
+    req: Request<never, CourseResponse[], never, CourseRequestQueryParams>,
     res: Response<CourseResponse[]>,
-  ) => {
-    res.json(courses);
+  ): void => {
+    courseController.getCourses(req.query, res);
   },
 );
 
@@ -52,13 +50,8 @@ coursesRouter.get(
       never
     >,
     res: Response<CourseResponse | ErrorResponse>,
-  ) => {
-    const { id } = req.params;
-    const course = courses.find((c) => c.id === parseInt(id));
-    if (!course) {
-      res.status(404).json({ message: 'Course not found' });
-    }
-    res.json(course);
+  ): void => {
+    courseController.getCourseById(req.params, res);
   },
 );
 
@@ -74,15 +67,8 @@ coursesRouter.put(
       never
     >,
     res: Response<CourseResponse | ErrorResponse>,
-  ) => {
-    const { id } = req.params;
-    const course = courses.find((c) => c.id === parseInt(id));
-    if (course === undefined) {
-      res.status(404).json({ message: 'Course not found' });
-      return;
-    }
-    Object.assign(course, req.body);
-    res.json(course);
+  ): void => {
+    courseController.updateCourse(req.params, req.body, res);
   },
 );
 
@@ -99,13 +85,7 @@ coursesRouter.delete(
     >,
     res: Response<CourseResponse | ErrorResponse>,
   ) => {
-    const { id } = req.params;
-    const index = courses.findIndex((c) => c.id === parseInt(id));
-    if (index === -1) {
-      res.status(404).json({ message: 'Course not found' });
-    }
-    courses.splice(index, 1);
-    res.sendStatus(204);
+    courseController.deleteCourse(req.params, res);
   },
 );
 

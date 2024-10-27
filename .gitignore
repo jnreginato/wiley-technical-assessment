@@ -4,3 +4,4 @@
 /dist/
 
 /.env
+/src/infrastructure/data-source/database/courses.db
