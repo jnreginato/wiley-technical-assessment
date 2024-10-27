@@ -1,7 +1,7 @@
-import type { LoginRequestBody } from '@/application/routes/auth';
+import dotenv from 'dotenv';
+import type LoginRequestBody from '@/application/requests/LoginRequestBody';
 import type { Response } from 'express';
 import AuthController from '@/application/controllers/AuthController';
-import dotenv from 'dotenv';
 
 dotenv.config();
 
