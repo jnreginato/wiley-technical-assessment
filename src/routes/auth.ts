@@ -21,7 +21,7 @@ interface ErrorResponse {
 authRouter.post(
   '/login',
   (
-    req: Request<object, SuccessResponse | ErrorResponse, LoginRequestBody>,
+    req: Request<never, SuccessResponse | ErrorResponse, LoginRequestBody>,
     res: Response<SuccessResponse | ErrorResponse>,
   ): void => {
     authController.login(req.body, res);

@@ -20,7 +20,10 @@ export default class AuthController {
       return res.status(500).json({ message: 'JWT secret not configured' });
     }
 
-    const token = jwt.sign({ username }, secret, {
+    const token = jwt.sign({}, secret, {
+      subject: JSON.stringify({
+        username,
+      }),
       expiresIn: process.env.JWT_EXPIRATION_TIME,
     });
 
