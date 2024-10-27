@@ -54,8 +54,9 @@ describe('CourseController', () => {
 
   it('should get all courses', () => {
     const mockRequest: CourseRequestQueryParams = {
-      search: '',
-      sortBy: '',
+      filter: '',
+      sort: '',
+      page: '',
     };
 
     const mockCourses = [
