@@ -17,7 +17,7 @@ module.exports = typescriptEslint.config(
   {
     name: 'default eslint config',
     files: ['src/**/*.ts'],
-    ignores: ['dist', 'node_modules'],
+    ignores: ['dist', 'node_modules', 'src/**/*.spec.ts'],
     languageOptions: {
       sourceType: 'module',
       globals: {
