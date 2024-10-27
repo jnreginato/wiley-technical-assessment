@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import type { LoginRequestBody } from '@/routes/auth';
+import type { LoginRequestBody } from '@/application/routes/auth';
 import type { Response } from 'express';
 
 export default class AuthController {
