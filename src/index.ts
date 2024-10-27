@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import authRouter from '@/application/routes/auth';
+import coursesRouter from '@/application/routes/courses';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.get('/', (req, res): void => {
   res.send('Server is running!');
 });
 app.use('/api', authRouter);
+app.use('/api', coursesRouter);
 
 const PORT = process.env.PORT ?? '3000';
 
