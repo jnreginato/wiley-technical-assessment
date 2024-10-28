@@ -28,7 +28,39 @@ const courseValidationRules = [
   body('instructor').notEmpty().withMessage('Instructor is required'),
 ];
 
-// Create a course
+/**
+ * @swagger
+ * tags:
+ *   name: Courses
+ *   description: API for managing courses
+ */
+
+/**
+ * @swagger
+ * /courses:
+ *   post:
+ *     summary: Create a new course
+ *     tags: [Courses]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CourseRequestBody'
+ *     responses:
+ *       201:
+ *         description: Course created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CourseResponse'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 coursesRouter.post(
   '/courses',
   authMiddleware.process,
@@ -42,7 +74,38 @@ coursesRouter.post(
   },
 );
 
-// Read courses
+/**
+ * @swagger
+ * /courses:
+ *   get:
+ *     summary: Retrieve a list of courses
+ *     tags: [Courses]
+ *     parameters:
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *         description: Filter courses by title
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *         description: Sort courses by a specified field
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: string
+ *         description: Page number for pagination
+ *     responses:
+ *       200:
+ *         description: List of courses
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CourseResponse'
+ */
 coursesRouter.get(
   '/courses',
   authMiddleware.process,
@@ -63,7 +126,33 @@ coursesRouter.get(
   },
 );
 
-// Read a single course
+/**
+ * @swagger
+ * /courses/{id}:
+ *   get:
+ *     summary: Retrieve a single course by ID
+ *     tags: [Courses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the course to retrieve
+ *     responses:
+ *       200:
+ *         description: Course details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CourseResponse'
+ *       404:
+ *         description: Course not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 coursesRouter.get(
   '/courses/:id',
   authMiddleware.process,
@@ -82,7 +171,39 @@ coursesRouter.get(
   },
 );
 
-// Update a course
+/**
+ * @swagger
+ * /courses/{id}:
+ *   put:
+ *     summary: Update an existing course by ID
+ *     tags: [Courses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the course to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CourseRequestBody'
+ *     responses:
+ *       200:
+ *         description: Course updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CourseResponse'
+ *       404:
+ *         description: Course not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 coursesRouter.put(
   '/courses/:id',
   authMiddleware.process,
@@ -104,7 +225,29 @@ coursesRouter.put(
   },
 );
 
-// Delete a course
+/**
+ * @swagger
+ * /courses/{id}:
+ *   delete:
+ *     summary: Delete a course by ID
+ *     tags: [Courses]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the course to delete
+ *     responses:
+ *       204:
+ *         description: Course deleted successfully
+ *       404:
+ *         description: Course not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 coursesRouter.delete(
   '/courses/:id',
   authMiddleware.process,
