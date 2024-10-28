@@ -3,10 +3,15 @@ import type CourseRequestPathParams from '@/application/requests/CourseRequestPa
 import type CourseRequestQueryParams from '@/application/requests/CourseRequestQueryParams';
 import type { Response } from 'express';
 import CourseController from '@/application/controllers/CourseController';
-import db from '@/infrastructure/data-source/database/sqlite';
+import CourseEntity from '@/domain/entities/CourseEntity';
+import CourseRepository from '@/infrastructure/repositories/CourseRepository';
 
-jest.mock('@/infrastructure/data-source/database/sqlite', () => ({
-  prepare: jest.fn(),
+jest.mock('@/infrastructure/repositories/CourseRepository', () => ({
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findById: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
 }));
 
 describe('CourseController', () => {
@@ -26,7 +31,7 @@ describe('CourseController', () => {
     jest.clearAllMocks();
   });
 
-  it('should create a course and return it', () => {
+  it('should create a course and return it', (): void => {
     const mockRequest: CourseRequestBody = {
       title: 'Test Course',
       description: 'This is a test course',
@@ -34,21 +39,14 @@ describe('CourseController', () => {
       instructor: 'Instructor Name',
     };
 
-    const mockStmt = {
-      run: jest.fn().mockReturnValue({ lastInsertRowid: 1 }),
-    };
-
-    (db.prepare as jest.Mock).mockReturnValue(mockStmt);
+    (CourseRepository.create as jest.Mock).mockReturnValue(1);
 
     courseController.createCourse(mockRequest, mockResponse as Response);
 
     expect(mockResponse.status).toHaveBeenCalledWith(201);
     expect(mockResponse.json).toHaveBeenCalledWith({
       id: 1,
-      title: mockRequest.title,
-      description: mockRequest.description,
-      duration: mockRequest.duration,
-      instructor: mockRequest.instructor,
+      ...mockRequest,
     });
   });
 
@@ -60,25 +58,11 @@ describe('CourseController', () => {
     };
 
     const mockCourses = [
-      {
-        id: 1,
-        title: 'Test Course 1',
-        description: 'Description 1',
-        duration: '1 hour',
-        instructor: 'Instructor 1',
-      },
-      {
-        id: 2,
-        title: 'Test Course 2',
-        description: 'Description 2',
-        duration: '2 hours',
-        instructor: 'Instructor 2',
-      },
+      new CourseEntity('Test Course 1', 'Description 1', 1, 'Instructor 1', 1),
+      new CourseEntity('Test Course 2', 'Description 2', 2, 'Instructor 2', 2),
     ];
 
-    (db.prepare as jest.Mock).mockReturnValue({
-      all: jest.fn().mockReturnValue(mockCourses),
-    });
+    (CourseRepository.findAll as jest.Mock).mockReturnValue(mockCourses);
 
     courseController.getCourses(mockRequest, mockResponse as Response);
 
@@ -87,18 +71,15 @@ describe('CourseController', () => {
 
   it('should get a course by id', () => {
     const mockRequest: CourseRequestPathParams = { id: '1' };
+    const mockCourse = new CourseEntity(
+      'Test Course',
+      'This is a test course',
+      3,
+      'Instructor Name',
+      1,
+    );
 
-    const mockCourse = {
-      id: 1,
-      title: 'Test Course',
-      description: 'This is a test course',
-      duration: 3,
-      instructor: 'Instructor Name',
-    };
-
-    (db.prepare as jest.Mock).mockReturnValue({
-      get: jest.fn().mockReturnValue(mockCourse),
-    });
+    (CourseRepository.findById as jest.Mock).mockReturnValue(mockCourse);
 
     courseController.getCourseById(mockRequest, mockResponse as Response);
 
@@ -108,9 +89,7 @@ describe('CourseController', () => {
   it('should return 404 if course not found by id', () => {
     const mockRequest: CourseRequestPathParams = { id: '999' };
 
-    (db.prepare as jest.Mock).mockReturnValue({
-      get: jest.fn().mockReturnValue(undefined),
-    });
+    (CourseRepository.findById as jest.Mock).mockReturnValue(null);
 
     courseController.getCourseById(mockRequest, mockResponse as Response);
 
@@ -137,11 +116,7 @@ describe('CourseController', () => {
       instructor: 'Updated Instructor',
     };
 
-    const mockStmt = {
-      run: jest.fn().mockReturnValue({ changes: 1 }),
-    };
-
-    (db.prepare as jest.Mock).mockReturnValue(mockStmt);
+    (CourseRepository.update as jest.Mock).mockReturnValue(true);
 
     courseController.updateCourse(
       mockRequestParams,
@@ -161,11 +136,7 @@ describe('CourseController', () => {
       instructor: 'Instructor Name',
     };
 
-    const mockStmt = {
-      run: jest.fn().mockReturnValue({ changes: 0 }),
-    };
-
-    (db.prepare as jest.Mock).mockReturnValue(mockStmt);
+    (CourseRepository.update as jest.Mock).mockReturnValue(false);
 
     courseController.updateCourse(
       mockRequestParams,
@@ -182,11 +153,7 @@ describe('CourseController', () => {
   it('should delete a course and return 204', () => {
     const mockRequest: CourseRequestPathParams = { id: '1' };
 
-    const mockStmt = {
-      run: jest.fn().mockReturnValue({ changes: 1 }),
-    };
-
-    (db.prepare as jest.Mock).mockReturnValue(mockStmt);
+    (CourseRepository.delete as jest.Mock).mockReturnValue(true);
 
     courseController.deleteCourse(mockRequest, mockResponse as Response);
 
@@ -196,11 +163,7 @@ describe('CourseController', () => {
   it('should return 404 if course not found on delete', () => {
     const mockRequest: CourseRequestPathParams = { id: '999' };
 
-    const mockStmt = {
-      run: jest.fn().mockReturnValue({ changes: 0 }),
-    };
-
-    (db.prepare as jest.Mock).mockReturnValue(mockStmt);
+    (CourseRepository.delete as jest.Mock).mockReturnValue(false);
 
     courseController.deleteCourse(mockRequest, mockResponse as Response);
 

@@ -3,39 +3,34 @@ import type CourseRequestPathParams from '@/application/requests/CourseRequestPa
 import type CourseRequestQueryParams from '@/application/requests/CourseRequestQueryParams';
 import type CourseResponse from '@/application/responses/CourseResponse';
 import type { Response } from 'express';
-import db from '@/infrastructure/data-source/database/sqlite';
+import CourseEntity from '@/domain/entities/CourseEntity';
+import CourseRepository from '@/infrastructure/repositories/CourseRepository';
 
 export default class CourseController {
   public createCourse(input: CourseRequestBody, res: Response): void {
     const { title, description, duration, instructor } = input;
+    const course = new CourseEntity(title, description, duration, instructor);
+    const id = CourseRepository.create(course);
 
-    const stmt = db.prepare(`
-      INSERT INTO courses (title, description, duration, instructor)
-      VALUES (?, ?, ?, ?)
-    `);
-
-    const info = stmt.run(title, description, duration, instructor);
     res.status(201).json({
-      id: info.lastInsertRowid,
-      title,
-      description,
-      duration,
-      instructor,
+      id,
+      title: course.title,
+      description: course.description,
+      duration: course.duration,
+      instructor: course.instructor,
     });
   }
 
   public getCourses(_input: CourseRequestQueryParams, res: Response): void {
-    const stmt = db.prepare(`SELECT * FROM courses`);
-    const courses = stmt.all() as CourseResponse[];
+    const courses = CourseRepository.findAll();
     res.json(courses);
   }
 
   public getCourseById(input: CourseRequestPathParams, res: Response): void {
     const { id } = input;
-    const stmt = db.prepare(`SELECT * FROM courses WHERE id = ?`);
-    const course = stmt.get(id);
+    const course = CourseRepository.findById(Number(id));
 
-    if (course === undefined) {
+    if (course === null) {
       res.status(404).json({ message: 'Course not found' });
       return;
     }
@@ -51,15 +46,16 @@ export default class CourseController {
     const { id } = params;
     const { title, description, duration, instructor } = body;
 
-    const stmt = db.prepare(`
-      UPDATE courses
-      SET title = ?, description = ?, duration = ?, instructor = ?
-      WHERE id = ?
-    `);
+    const course = new CourseEntity(
+      title,
+      description,
+      duration,
+      instructor,
+      Number(id),
+    );
+    const success = CourseRepository.update(course);
 
-    const info = stmt.run(title, description, duration, instructor, id);
-
-    if (info.changes <= 0) {
+    if (!success) {
       res.status(404).json({ message: 'Course not found' });
       return;
     }
@@ -69,10 +65,9 @@ export default class CourseController {
 
   public deleteCourse(input: CourseRequestPathParams, res: Response): void {
     const { id } = input;
-    const stmt = db.prepare(`DELETE FROM courses WHERE id = ?`);
-    const info = stmt.run(id);
+    const success = CourseRepository.delete(Number(id));
 
-    if (info.changes <= 0) {
+    if (!success) {
       res.status(404).json({ message: 'Course not found' });
       return;
     }
