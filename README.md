@@ -164,6 +164,8 @@ project-root/
 
 ## Endpoints
 
+> **Note:** A detailed API documentation is available at http://localhost:3000/, where you can view and interact with all endpoints.
+
 ### Authentication
 
 - **POST /api/login**: Logs in and returns a JWT token.
