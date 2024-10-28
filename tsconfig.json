@@ -27,9 +27,9 @@
 
     // Directory and path mapping
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["*"]
     },
 
     // Other options
