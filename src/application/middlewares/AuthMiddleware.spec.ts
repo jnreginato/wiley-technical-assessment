@@ -25,12 +25,14 @@ describe('AuthMiddleware', (): void => {
   });
 
   it('should return 401 if token is not sent', async (): Promise<void> => {
+    // 🚀 ACT
     await middleware.process(
       mockRequest as Request,
       mockResponse as Response,
       mockNext,
     );
 
+    // 👀 ASSERT
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
       message: 'Token not sent.',
@@ -38,16 +40,19 @@ describe('AuthMiddleware', (): void => {
   });
 
   it('should return 500 if JWT secret is not configured', async (): Promise<void> => {
+    // 🔧 ARRANGE
     mockRequest.headers = { authorization: 'Bearer valid_token' };
 
     delete process.env.JWT_SECRET;
 
+    // 🚀 ACT
     await middleware.process(
       mockRequest as Request,
       mockResponse as Response,
       mockNext,
     );
 
+    // 👀 ASSERT
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith({
       message: 'JWT secret not configured',
@@ -55,18 +60,21 @@ describe('AuthMiddleware', (): void => {
   });
 
   it('should return 403 if token is invalid', async (): Promise<void> => {
+    // 🔧 ARRANGE
     mockRequest.headers = { authorization: 'Bearer invalid_token' };
     process.env.JWT_SECRET = 'jwt_secret';
     (verify as jest.Mock).mockImplementation(() => {
       throw new Error('Invalid token');
     });
 
+    // 🚀 ACT
     await middleware.process(
       mockRequest as Request,
       mockResponse as Response,
       mockNext,
     );
 
+    // 👀 ASSERT
     expect(mockResponse.status).toHaveBeenCalledWith(403);
     expect(mockResponse.json).toHaveBeenCalledWith({
       message: 'Invalid token.',
@@ -74,18 +82,21 @@ describe('AuthMiddleware', (): void => {
   });
 
   it('should call next() and attach user if token is valid', async (): Promise<void> => {
+    // 🔧 ARRANGE
     mockRequest.headers = { authorization: 'Bearer valid_token' };
     process.env.JWT_SECRET = 'jwt_secret';
     (verify as jest.Mock).mockImplementation(() => {
       return { sub: JSON.stringify({ username: 'admin' }) };
     });
 
+    // 🚀 ACT
     await middleware.process(
       mockRequest as Request,
       mockResponse as Response,
       mockNext,
     );
 
+    // 👀 ASSERT
     expect(mockRequest.user).toEqual({ username: 'admin' });
     expect(mockNext).toHaveBeenCalled();
   });

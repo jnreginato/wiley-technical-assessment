@@ -18,13 +18,16 @@ describe('AuthController', (): void => {
   });
 
   it('should return 401 for invalid credentials', (): void => {
+    // 🔧 ARRANGE
     const mockRequest: LoginRequestBody = {
       username: 'wrongUser',
       password: 'wrongPassword',
     };
 
+    // 🚀 ACT
     authController.login(mockRequest, mockResponse);
 
+    // 👀 ASSERT
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({
       message: 'Invalid credentials',
@@ -32,6 +35,7 @@ describe('AuthController', (): void => {
   });
 
   it('should return 500 if JWT secret is not configured', (): void => {
+    // 🔧 ARRANGE
     const mockRequest: LoginRequestBody = {
       username: 'admin',
       password: 'password',
@@ -39,8 +43,10 @@ describe('AuthController', (): void => {
 
     delete process.env.JWT_SECRET;
 
+    // 🚀 ACT
     authController.login(mockRequest, mockResponse);
 
+    // 👀 ASSERT
     expect(mockResponse.status).toHaveBeenCalledWith(500);
     expect(mockResponse.json).toHaveBeenCalledWith({
       message: 'JWT secret not configured',
@@ -48,6 +54,7 @@ describe('AuthController', (): void => {
   });
 
   it('should return a token for valid credentials', (): void => {
+    // 🔧 ARRANGE
     const mockRequest: LoginRequestBody = {
       username: process.env.TEST_USERNAME ?? '',
       password: process.env.TEST_PASSWORD ?? '',
@@ -56,8 +63,10 @@ describe('AuthController', (): void => {
     process.env.JWT_SECRET = 'jwt_secret';
     process.env.JWT_EXPIRATION_TIME = '10s';
 
+    // 🚀 ACT
     authController.login(mockRequest, mockResponse);
 
+    // 👀 ASSERT
     expect(mockResponse.json).toHaveBeenCalledWith(
       expect.objectContaining({
         token: expect.stringMatching(

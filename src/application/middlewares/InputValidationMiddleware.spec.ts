@@ -27,6 +27,7 @@ describe('InputValidationMiddleware', (): void => {
   });
 
   it('should return 400 if there are validation errors', async (): Promise<void> => {
+    // 🔧 ARRANGE
     const mockErrors = {
       isEmpty: jest.fn().mockReturnValue(false),
       array: jest.fn().mockReturnValue([{ msg: 'Invalid value' }]),
@@ -34,12 +35,14 @@ describe('InputValidationMiddleware', (): void => {
 
     (validationResult as unknown as jest.Mock).mockReturnValue(mockErrors);
 
+    // 🚀 ACT
     await inputValidationMiddleware.process(
       mockRequest as Request,
       mockResponse as Response,
       mockNext,
     );
 
+    // 👀 ASSERT
     expect(mockResponse.status).toHaveBeenCalledWith(400);
     expect(mockResponse.json).toHaveBeenCalledWith({
       errors: [{ msg: 'Invalid value' }],
@@ -48,18 +51,21 @@ describe('InputValidationMiddleware', (): void => {
   });
 
   it('should call next() if there are no validation errors', async (): Promise<void> => {
+    // 🔧 ARRANGE
     const mockErrors = {
       isEmpty: jest.fn().mockReturnValue(true),
     };
 
     (validationResult as unknown as jest.Mock).mockReturnValue(mockErrors);
 
+    // 🚀 ACT
     await inputValidationMiddleware.process(
       mockRequest as Request,
       mockResponse as Response,
       mockNext,
     );
 
+    // 👀 ASSERT
     expect(mockNext).toHaveBeenCalled();
     expect(mockResponse.status).not.toHaveBeenCalled();
     expect(mockResponse.json).not.toHaveBeenCalled();
